@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC
+      "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+          "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- ORM就是实体关系映射，将面向对象编程的方法论和关系性数据库的方法论做相关映射  -->
+<!-- ORM映射配置文件 -->
+<hibernate-mapping package="cn.com.lc.bean">
+    <!--class 配置实体和表的关系 
+        name:表示实体类名
+        table: 相关表名  -->	   
+    <class name="Music" table="musicTbl">
+    	<!-- 配置表的主键列
+    	   name 类的属性名
+    	   column 表的列名 -->
+        <id name="mid" column="mid">
+        	<!-- generator 主键生成策略
+        	     native 自动采用数据库中的相关方法来生成 -->
+            <generator class="native" />
+        </id>
+        <!-- 设置实体关联属性
+           name: 属性名
+           column： 列名 -->
+        <property name="musicsinger" column="musicsinger" />
+        <property name="musicname" column="musicname" />
+        <property name="musicpath" column="musicpath" />
+		<!-- 多对多      
+        <set name="musics" table="userMusicTbl">
+        	<key column="uid"></key>
+        	<many-to-many class="Music" column="mid"></many-to-many>
+        </set>-->   
+    </class>
+</hibernate-mapping>
+
+
+
+

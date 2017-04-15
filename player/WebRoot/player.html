@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>聊城大学音乐播放器</title>
+    <!-- 导入外部css样式 -->
+
+    <link rel="stylesheet" type="text/css" href="css/index.css" />
+    <link rel="stylesheet" type="text/css" href="css/login.css" />
+    <style type="text/css">
+        /*登陆按钮*/
+        #scbar_hot{height: 33px;position: absolute;right:10px;top:10px;}
+        #scbar_hot a{width: 90px;height: 31px;border: solid 1px #c5c5c5;border-radius: 5px;background: url(images/login_bg.jpg) repeat-x;text-align: center;line-height: 31px;display:block;}
+        
+    </style>
+</head>
+<body>
+    <!--登陆按钮-->
+    <div id="scbar_hot">
+        <a href="#" class="xi2">登&nbsp;&nbsp;&nbsp;录</a>
+    </div>
+    <!--音乐界面-->
+    <div id="ui-audioface">
+        <!-- 音乐播放器的容器 -->
+        <div id="ui-content">
+            <!-- 唱片图片 -->
+            <img src="images/disk.jpg" class="ui-disk" />
+            <!-- 唱片信息 -->
+            <dl class="ui-info">
+                <dt>未选择</dt>
+                <dd></dd>
+                <dd>0:00</dd>
+            </dl>
+            <!-- 右上工具条 -->
+            <ul class="ui-tool">
+                <li>
+                    <a href="#" class="ui-icon ui-list">0</a>
+                </li>
+                <li>
+                    <a href="#" class="ui-score ui-show">谱</a>
+                </li>
+            </ul>
+            <!-- 播放条 -->
+            <div class="ui-opface">
+                <!-- 上一首 -->
+                <a href="#" class="ui-icon ui-prev"></a>
+                <!-- 播放 -->
+                <a href="#" class="ui-icon ui-play"></a>
+                <!-- 下一首 -->
+                <a href="#" class="ui-icon ui-next"></a>
+                <!-- 循环播发 -->
+                <a href="#" class="ui-icon ui-cycle"></a>
+                <!-- 声音调节 -->
+                <a href="#" class="ui-icon ui-volume-icon"></a>
+                <!-- 条状物 -->
+                <span class="ui-icon ui-rate">
+                    <a href="#" class="ui-icon"></a>
+                </span>
+            </div>
+        </div>
+        <!-- 歌曲列表div -->
+        <div id="ui-list">
+            <ul>
+                <li> <a href="#">歌曲列表</a> </li>
+            </ul>
+        </div>
+        <!-- 收藏歌曲列表div -->
+        <div id="ui-listfav">
+            <ul>
+                <li> <a href="#">收藏列表</a> </li>
+            </ul>
+        </div>
+        <button class="ui-icon ui-becket"></button>
+        <!-- 曲谱 -->
+        <div class="ui-score">
+            <canvas id="canvas"></canvas>
+        </div>
+    </div>
+    <!--登陆div-->
+    <div id="content">
+        <div class="login-header">
+        <img src="images/hy.jpg">
+        </div>
+        <form>
+        <div class="login-input-box">
+            <span class="icon icon-user"></span>
+            <input type="text" id="username" placeholder="请输入用户名">
+        </div>
+        <div class="login-input-box">
+            <span class="icon icon-password"></span>
+            <input type="password" id="password" placeholder="请输入密码">
+        </div>
+        </form>
+        <div class="login-button-box">
+        <button>登陆</button>
+        </div>
+    </div>
+    <script type="text/javascript" src="js/audioface.js"></script>
+    <script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+    <script type="text/javascript">
+            $("document").ready(function(){
+                var vhtml="";
+                $.post("test1.action",function(data){
+                   // console.info(data.musics);
+                    //console.info(data.musics[0]);
+                    //console.info(data.musics[0].musicsinger);
+                    var objs = data.musics;
+                    //设置歌曲总
+                    for (var i = 0; i < objs.length; i++) {
+vhtml+='<li mid='+objs[i].mid+' path="music/'+objs[i].musicpath+'" name="'+objs[i].musicname+'" singer="'+objs[i].musicsinger+'"><a href="#">'+objs[i].musicname+'</a><a href="#">'+objs[i].musicsinger+'</a><a href="javascript:void(0);" onclick="plusMusic('+objs[i].mid+',\''+objs[i].musicpath+'\',\''+objs[i].musicname+'\',\''+objs[i].musicsinger+'\')">+</a></li>';
+                    }
+                    //console.info(vhtml);
+                    $("#ui-list ul").append(vhtml);
+                    /*显示歌曲的数目*/
+                    $("#ui-content ul.ui-tool li a.ui-list").text(objs.length);
+                });
+            });
+            //登陆按钮点击事件
+            $("#scbar_hot a").click(function() {
+                //显示遮罩层
+                $("#content").fadeIn(800);
+            });
+            //登陆点击
+            $("#content div.login-button-box button").click(function() {
+                 var nm = $("#content #username").val();
+                 var ps = $("#content #password").val();
+                 $.post("user_login.action",{"name":nm,"pass":ps},function(data){
+                    console.info(data.user);
+                    vhtml="";
+                    var objs = data.user.musics;
+                    for (var i = 0; i < objs.length; i++) {
+vhtml+='<li mid='+objs[i].mid+' path="music/'+objs[i].musicpath+'" name="'+objs[i].musicname+'" singer="'+objs[i].musicsinger+'"><a href="#">'+objs[i].musicname+'</a><a href="#">'+objs[i].musicsinger+'</a></li>';
+                    }
+                    $("#ui-listfav ul").append(vhtml);
+                    //隐藏登录div
+                    $("#content").fadeOut(800);
+                });
+            });
+     </script>
+    <script type="text/javascript">
+    	//
+    	function plusMusic(mid,mpath,mname,msinger){
+    		vhtml='';
+    		alert(mpath);
+    		$.post("user_addmu.action",{"mid":mid},function(data){
+    			console.log(data.flag);
+    			if(data.flag)
+    				vhtml='<li mid='+mid+' path="music/'+mpath+'" name="'+mname+'" singer="'+msinger+'"><a href="#">'+mname+'</a><a href="#">'+msinger+'</a></li>';
+    			$("#ui-listfav ul").append(vhtml);
+    		});
+    	}
+    	
+        // 创建音频对象
+        var audioface = new AudioFace("canvas",15);
+        // 统一动画时长
+        var effect = 500;
+        //播放回调函数onplay
+        audioface.onplay=function(duration){
+            $("#ui-audioface img.ui-disk").addClass('ui-play');
+            //将浮点数变整数
+            $("#ui-audioface dl.ui-info dd:last").text(parseInt(duration/60)+":"+parseInt(duration%60));
+        }
+        audioface.onpause=function(){
+            $("#ui-audioface img.ui-disk").removeClass('ui-play');
+        }
+        //网页加载后，执行的内容
+        $(function(){
+        	var $plus = $("#ui-audioface div.ui-list ul li a.ui-plus").on('click', function() {
+				alert($(this));
+			});
+        
+            //收藏歌曲列表项
+            var $music2 = $("#ui-audioface div#ui-listfav ul");
+            //添加点击事件
+            $music2.on('click','li', function(){
+                //修改歌曲信息区域内容
+                var $this = $(this);
+                var path = $this.attr("path");//播放路径
+                var name = $this.attr("name");//播放歌曲名字
+                var singer = $this.attr("singer");//歌手
+                //点选的变红色,其他的删除变红这个类样式
+                $this.addClass('ui-curr').siblings().removeClass('ui-curr');
+                //修改歌曲名称
+                $("#ui-audioface dl.ui-info dt").text(name);
+                $("#ui-audioface dl.ui-info dd:first").text(singer);
+                $("#ui-audioface dl.ui-info dd:last").text("正在加载..");
+                audioface.request(path);//根据路径强求音乐数据
+                $("#ui-audioface #ui-content a.ui-play").addClass('ui-pause');
+            });
+
+            //获取歌曲列表项
+            var $music = $("#ui-audioface div#ui-list ul");
+            //添加点击事件
+            $music.on('click','li', function(){
+                //修改歌曲信息区域内容
+                var $this = $(this);
+                var path = $this.attr("path");//播放路径
+                var name = $this.attr("name");//播放歌曲名字
+                var singer = $this.attr("singer");//歌手
+                //点选的变红色,其他的删除变红这个类样式
+                $this.addClass('ui-curr').siblings().removeClass('ui-curr');
+                //修改歌曲名称
+                $("#ui-audioface dl.ui-info dt").text(name);
+                $("#ui-audioface dl.ui-info dd:first").text(singer);
+                $("#ui-audioface dl.ui-info dd:last").text("正在加载..");
+                audioface.request(path);//根据路径强求音乐数据
+                $("#ui-audioface #ui-content a.ui-play").addClass('ui-pause');
+            });
+            //双击添加到收藏
+            $music.on('dbclick','li', function(){
+                //修改歌曲信息区域内容
+                var $this = $(this);
+                var mid = $this.attr("mid");
+                $.post("user_addmu.action",{"mid":mid},function(data){
+                	console.log(data);
+            	});
+            });
+            
+            /*显示歌曲的数目*/
+            $("#ui-content ul.ui-tool li a.ui-list").text($music.size());
+            /*隐藏曲谱*/
+            var $score=$("#ui-audioface div.ui-score");
+            $("#ui-content ul.ui-tool li a.ui-show").click(function(){
+                /*判断曲谱的状态*/
+                if ($(this).toggleClass('ui-show').hasClass('ui-show')) {
+                    $score.fadeIn(effect);
+                }else{
+                    $score.fadeOut(effect);
+                }    
+            });
+            /*隐藏歌曲列表*/
+            var $list = $("#ui-audioface #ui-list");
+            $("#ui-content ul.ui-tool li a.ui-list").click(function(){
+                $list.fadeToggle(effect);
+            });
+            // 隐藏播放器
+             var $face = $("#ui-audioface");
+            $("#ui-audioface button.ui-becket").click(function(){
+                var $this = $(this);
+                //判断按钮的状态
+                if ($this.hasClass('ui-becket-hide')) {
+                    //执行时长为500毫秒的动画，效果为距离左侧0px，也就是显示出来对应的播放器div，动画执行后删除类样式，初始箭头方向
+                    $face.animate({left: 0},effect, function() {
+                        $this.removeClass('ui-becket-hide');
+                    });
+                }
+                else{
+                    //执行时长为500毫秒的动画，效果为距离左侧-540px，也就是隐藏对应的播放器div,动画执行后添加类样式，箭头相左
+                    $face.animate({left: -520},effect, function() {
+                        $this.addClass('ui-becket-hide');
+                    });
+                }
+            });
+            //播放按钮的点击
+            $("#ui-audioface #ui-content a.ui-play").click(function(){
+                //判断播放状态 当状态0时什么都不做
+                var status = audioface.status;
+                if (status != 0) {
+                    if (status==1) {//如果为1表示正在播放变为暂停播放
+                        audioface.pause();
+                        $(this).removeClass('ui-pause');
+                    }else{//如果为2表示暂停播放变为正在播放
+                        audioface.resume();
+                        $(this).addClass('ui-pause');
+                    }
+                }
+            });
+            //下一首
+            $("#ui-audioface #ui-content a.ui-next").click(function(){
+                //选中红色的下一首，并触发点击行为
+                $("#ui-audioface div#ui-list ul li.ui-curr").next().trigger('click');
+            });
+            //上一首
+            $("#ui-audioface #ui-content a.ui-prev").click(function(){
+                //选中红色的上一首，并触发点击行为
+                $("#ui-audioface div#ui-list ul li.ui-curr").prev().trigger('click');
+            });
+        });
+    </script>
+</body>
+</html>

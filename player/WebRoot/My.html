@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+    <head>
+    	<meta charset="utf-8">
+        <script type="text/javascript" src="js/jquery-1.11.1.min.js"></script>
+        <script type="text/javascript">
+            $("document").ready(function(){
+                $.post("test1.action",function(data){
+                    console.info(data.musics);
+                    console.info(data.musics[0]);
+                    console.info(data.musics[0].musicsinger);
+                    $("#info").html(data.musics);
+                });
+            
+            });
+        </script>
+    </head>
+
+    <body>
+        Hello,Struts2!<div id="info"></div>
+    </body>
+</html>

@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+       					   http://www.springframework.org/schema/beans/spring-beans.xsd
+       					   http://www.springframework.org/schema/tx 
+       					   http://www.springframework.org/schema/tx/spring-tx.xsd
+       					   http://www.springframework.org/schema/aop 
+       					   http://www.springframework.org/schema/aop/spring-aop.xsd
+       					   http://www.springframework.org/schema/context 
+       					   http://www.springframework.org/schema/context/spring-context.xsd">
+	<!-- 1.配置数据源 -->
+	<bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+		<property name="driverClass" 
+				  value="com.microsoft.sqlserver.jdbc.SQLServerDriver"></property>
+		<property name="jdbcUrl" 
+				  value="jdbc:sqlserver://localhost:1433;DatabaseName=player"></property>
+		<property name="user" value="sa"></property>
+		<property name="password" value="student123456"></property>
+	</bean>
+	<!-- 2.配置sessionFactory -->
+	<bean id="sessionFactory" class="org.springframework.orm.hibernate3.LocalSessionFactoryBean">
+		<property name="dataSource" ref="dataSource"></property>
+		<property name="hibernateProperties">
+			<props>
+				<prop key="hibernate.show_sql">true</prop>
+				<prop key="hibernate.dialect">org.hibernate.dialect.SQLServerDialect</prop>
+			</props>
+		</property>
+		<property name="mappingLocations" 
+		 		  value="classpath:cn/com/lc/bean/*.hbm.xml"></property>
+	</bean>
+	<!-- 3.配置数据访问层dao -->
+	<bean id="userDao" class="cn.com.lc.dao.impl.UserDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	<bean id="musicDao" class="cn.com.lc.dao.impl.MusicDaoImpl">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	<!-- 4.服务层 -->
+	<bean id="userService" class="cn.com.lc.service.impl.UserServiceImpl">
+		<property name="userDao" ref="userDao"></property>
+	</bean>
+	<bean id="musicService" class="cn.com.lc.service.impl.MusicServiceImpl">
+		<property name="musicDao" ref="musicDao"></property>
+	</bean>
+	<!-- 5.事物处理 -->
+	<!-- 5.1 事务管理器 -->
+	<bean id="txManager" class="org.springframework.orm.hibernate3.HibernateTransactionManager">
+		<property name="sessionFactory" ref="sessionFactory"></property>
+	</bean>
+	<!-- 5.2 事物详情 -->
+	<tx:advice id="txAdvice" transaction-manager="txManager">
+		<tx:attributes>
+			<tx:method name="addMusic"/>
+			<tx:method name="delMusic"/>
+		</tx:attributes>
+	</tx:advice>
+	<!-- 5.3 AOP编程对象 -->
+	<aop:config>                                     
+		<aop:advisor advice-ref="txAdvice" pointcut="execution(* cn.com.lc.service..*.*(..))"/>
+	</aop:config>
+</beans>
+
+
+
+
+
+
+
+
+
+
